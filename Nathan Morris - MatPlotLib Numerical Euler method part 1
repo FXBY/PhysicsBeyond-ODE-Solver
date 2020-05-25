@@ -1,0 +1,58 @@
+#This is the very first numerical representation of ordinary differential equations
+#The equation is dy/dx = 3x - 2y
+#The initial conditions are x = 0, y = 1 and it repeats for 100 points
+
+#Importing the modules needed
+import numpy as np
+import math
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+import time
+
+#This is the actual loop where the new y = previous dy/dx + previous y
+#x increases linearly from 0 to 100 e.g. 1,2,3,4,5....,99,100
+def ode(x,prevy):
+    global prevdydx
+    y = prevy + prevdydx
+    #Here is where the new dy/dx is set
+    prevdydx = x*3 - 2*y
+    return y 
+
+#Arrays of points being set
+pointsx = []
+pointsy = []
+#Initial values of y and x being set i.e. x = 0, y =1
+pointsx.append(0)
+pointsy.append(1)
+#dy/dx at these intial points i.e. 3*0 - 2*1 = -2
+prevdydx = -2
+
+#visulising the points
+fig,ax = plt.subplots()
+lines = ax.plot([],[],lw=2)
+ax.set_ylim(-10,160)
+ax.set_xlim(-10,110)
+
+def init():
+    for l in lines:
+        l.set_data([], [])
+    return lines
+
+def animate(i):
+    #The loop for each point
+    global pointsx
+    global pointsy
+    global prevdydx
+    #This if loop is to stop there being two zeros in the pointsx array which would cause y to become huge
+    if i != 0:
+        #x from 1 to 100 being appended
+        pointsx.append(i)
+        #y at each point being appended using the functions above
+        pointsy.append(ode(pointsx[i],pointsy[i-1]))
+    for n, line in enumerate(lines):
+        line.set_data(pointsx,pointsy)
+    return lines
+
+a = animation.FuncAnimation(fig, animate,init_func = init,frames=100,interval=50,blit=True,repeat=False)
+
+plt.show()
